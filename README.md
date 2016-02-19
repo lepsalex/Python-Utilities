@@ -1,3 +1,3 @@
 # Python-Utilities
 
-Little python utility script written here and there
+Little python utility scripts written here and there
