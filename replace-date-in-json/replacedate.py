@@ -1,28 +1,21 @@
 # Search through json file to replace formatted dates with UNIX timestamps
+import json
 import time
 import datetime
 
-# Read in the file
-file = open('file.json', 'r')
-# Create temporary file buffer to manipulate
-fileData = file.read()
-file.close()
+# Read in the JSON
+with open('file.json') as json_file:
+    json_decoded = json.load(json_file)
 
-# Go through the file line-by-line
-for line in open('file.json'):
-    # If the query string is present in the line
-    if "startTime" in line:
-        # Get the line and strip empty space
-        lineString = line.strip()
-        # Slice the line for the current date length
-        timeString = lineString[14:-2]
-        # Convert the current formatted time string to UNIX datestamp format
-        timeStamp = time.mktime(datetime.datetime.strptime(timeString, "%Y-%m-%dT%H:%M:%S.000Z").timetuple())
-        # Replace the date
-        fileData = fileData.replace(timeString, str(timeStamp))
+# Go through each object in the JSON file
+for entry in json_decoded:
+    # Get current value for startTime
+    timeString = entry['startTime']
+    # Convert the current formatted time string to UNIX datestamp format
+    timeStamp = int(time.mktime(datetime.datetime.strptime(timeString, "%Y-%m-%dT%H:%M:%S.000Z").timetuple()))
+    # Replace the date
+    entry['startTime'] = str(timeStamp)
 
-# Read in file for write this time
-f = open('file-converted.json','w')
-# Write filedata (buffer) to file
-f.write(fileData)
-f.close()
+# Write new file with converted time values
+with open('file-converted.json', 'w') as json_file:
+    json.dump(json_decoded, json_file, indent=4, sort_keys=True)
